@@ -178,20 +178,19 @@ const confetti = function () {
 
     // tick simulation. clear canvas, when no particles left
     function animation() {
-        // draw
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(drawParticle);
-        ctx.fillStyle = makeColorString(choose(colors));
-        ctx.fillText(confetti.text, canvas.width / 2, canvas.height / 3);
-
         //update
         particles.forEach(updateParticle);
         removeDeadParticles(particles);
         running = particles.length > 0;
 
+        // draw
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = makeColorString(confetti.textColor);
+        ctx.fillText(confetti.text, canvas.width / 2, canvas.height / 3);
+        particles.forEach(drawParticle);
+
         //next frame
         if (running) requestAnimationFrame(animation);
-        else requestAnimationFrame(() => ctx.clearRect(0, 0, canvas.width, canvas.height));
     }
 
     // spawn number confetti into the simulation according to spawn information
@@ -207,6 +206,7 @@ const confetti = function () {
     }
 
     // exposed values
+    confetti.textColor = [233, 64, 35];
     confetti.text = "";
     confetti.canvas = canvas;
     confetti.colors = colors;
