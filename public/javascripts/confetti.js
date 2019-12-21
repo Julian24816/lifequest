@@ -33,14 +33,14 @@ const confetti = function () {
         return "rgba(" + colorArray + ", " + alpha + ")";
     }
 
-    function spawnParticle(x = undefined, y = undefined) {
+    function spawnParticle(spawnAttributes = new ParticleSpawn()) {
         particles.push({
-            x: x !== undefined ? x : random(canvas.width),
-            y: y !== undefined ? y : random(canvas.height),
-            radius: random(4) + 1,
-            color: choose(colors),
-            lifetime: random(400) + 100,
-            speed: random(1, false) + 0.5,
+            x: spawnAttributes.x,
+            y: spawnAttributes.y,
+            radius: spawnAttributes.radius,
+            color: spawnAttributes.color,
+            lifetime: spawnAttributes.lifetime,
+            speed: spawnAttributes.speed,
         });
         if (!running) requestAnimationFrame(animation);
         running = true;
@@ -78,36 +78,59 @@ const confetti = function () {
         else requestAnimationFrame(() => ctx.clearRect(0, 0, canvas.width, canvas.height));
     }
 
-    function topDelayed(delayEveryNParticles = 3) {
-        let counter = 0;
-        let x = random(canvas.width);
-        let y = 0;
-
-        function inc() {
-            counter++;
-            x = random(canvas.width);
+    class ParticleSpawn {
+        get x() {
+            return random(canvas.width);
         }
 
-        return {
-            get x() {
-                return x;
-            },
-            get y() {
-                return y;
-            },
-            get waitForNextFrame() {
-                return counter % delayEveryNParticles === 0;
-            },
-            get next() {
-                return inc;
-            }
+        get y() {
+            return random(canvas.height);
+        }
+
+        get radius() {
+            return random(4) + 1;
+        }
+
+        get color() {
+            return choose(colors);
+        }
+
+        get lifetime() {
+            return random(400) + 100;
+        }
+
+        get speed() {
+            return random(1, false) + 0.5;
+        }
+
+        get waitForNextFrame() {
+            return false;
+        }
+
+        next() {
         }
     }
 
-    function confetti(number, spawn = topDelayed()) {
+    class TopDelayedSpawn extends ParticleSpawn {
+        constructor(delayEveryNParticles = 3) {
+            super();
+            this.delayEveryNParticles = delayEveryNParticles;
+            this.counter = 0;
+        }
+
+        get y() {return 0;}
+        get waitForNextFrame() {
+            return this.counter % this.delayEveryNParticles === 0;
+        }
+        next() {
+            this.counter++;
+        }
+    }
+
+    function confetti(number, spawn = new TopDelayedSpawn()) {
         for (let i = 0; i < number; i++) {
             spawn.next();
-            spawnParticle(spawn.x, spawn.y);
+            spawnParticle(spawn);
             if (spawn.waitForNextFrame) {
                 requestAnimationFrame(() => confetti(number - i - 1, spawn));
                 break;
@@ -116,5 +139,6 @@ const confetti = function () {
     }
 
     confetti.colors = colors;
+    confetti.ParticleSpawnClass = ParticleSpawn;
     return confetti;
 }();
