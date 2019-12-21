@@ -1,6 +1,7 @@
 const confetti = function () {
     // canvas
     const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     canvas.style.position = "fixed";
     canvas.style.top = canvas.style.left = "0";
     canvas.width = window.innerWidth;
@@ -10,12 +11,6 @@ const confetti = function () {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     });
-
-    // context & text settings
-    const ctx = canvas.getContext("2d");
-    ctx.textBaseline = "middle";
-    ctx.textAlign = "center";
-    ctx.font = "20em san-serif";
 
     // default colors
     const colors = [[165, 104, 246], [230, 61, 135], [0, 199, 228], [253, 214, 126]];
@@ -185,8 +180,6 @@ const confetti = function () {
 
         // draw
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = makeColorString(confetti.textColor);
-        ctx.fillText(confetti.text, canvas.width / 2, canvas.height / 3);
         particles.forEach(drawParticle);
 
         //next frame
@@ -205,9 +198,6 @@ const confetti = function () {
         }
     }
 
-    // exposed values
-    confetti.textColor = [233, 64, 35];
-    confetti.text = "";
     confetti.canvas = canvas;
     confetti.colors = colors;
     confetti.ParticleSpawn = ParticleSpawn;
