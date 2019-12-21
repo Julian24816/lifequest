@@ -5,6 +5,10 @@ const confetti = function () {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     document.addEventListener("DOMContentLoaded", () => document.body.append(canvas));
+    document.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
 
     const ctx = canvas.getContext("2d");
     ////////////////////////////////// temp text test
@@ -39,7 +43,8 @@ const confetti = function () {
             radius: spawnAttributes.radius,
             color: spawnAttributes.color,
             lifetime: spawnAttributes.lifetime,
-            speed: spawnAttributes.speed,
+            velocity: spawnAttributes.velocity,
+            acceleration: spawnAttributes.acceleration,
         });
         if (!running) requestAnimationFrame(animation);
         running = true;
@@ -55,7 +60,8 @@ const confetti = function () {
 
     function updateParticle(particle) {
         particle.lifetime -= 1;
-        particle.pos.y += particle.speed;
+        particle.pos.add(particle.velocity);
+        particle.velocity.add(particle.acceleration);
     }
 
     function removeDeadParticles(particles) {
@@ -82,9 +88,14 @@ const confetti = function () {
             this.x = x;
             this.y = y;
         }
+
         add(other) {
             this.x += other.x;
             this.y += other.y;
+        }
+
+        copy() {
+            return new Vec2(this.x, this.y);
         }
     }
 
@@ -105,8 +116,12 @@ const confetti = function () {
             return random(400) + 100;
         }
 
-        get speed() {
-            return random(1, false) + 0.5;
+        get velocity() {
+            return new Vec2(0, random(1, false) + 0.5);
+        }
+
+        get acceleration() {
+            return new Vec2(0, 0);
         }
 
         get waitForNextFrame() {
@@ -117,11 +132,25 @@ const confetti = function () {
         }
     }
 
-    class TopDelayedSpawn extends ParticleSpawn {
-        constructor(delayEveryNParticles = 3) {
+    class DelayedSpawn extends ParticleSpawn {
+        constructor(delayEveryNParticles = 5) {
             super();
             this.delayEveryNParticles = delayEveryNParticles;
             this.counter = 0;
+        }
+
+        get waitForNextFrame() {
+            return this.counter % this.delayEveryNParticles === 0;
+        }
+
+        next() {
+            this.counter++;
+        }
+    }
+
+    class TopSpawn extends DelayedSpawn {
+        constructor(delayEveryNParticles) {
+            super(delayEveryNParticles);
         }
 
         get pos() {
@@ -129,16 +158,32 @@ const confetti = function () {
             pos.y = 0;
             return pos;
         }
+    }
 
-        get waitForNextFrame() {
-            return this.counter % this.delayEveryNParticles === 0;
+    class ExplosionSpawn extends DelayedSpawn {
+        constructor(center = new Vec2(), speed = 1, variance = .5) {
+            super(20);
+            this.center = center;
+            this.speed = speed;
+            this.variance = variance;
         }
-        next() {
-            this.counter++;
+
+        get pos() {
+            return this.center.copy();
+        }
+
+        get velocity() {
+            const angle = random(Math.PI * 2, false);
+            const speed = this.speed + random(this.variance * 2, false) - this.variance;
+            return new Vec2(Math.cos(angle) * speed, Math.sin(angle) * speed);
+        }
+
+        get acceleration() {
+            return new Vec2(0, .02);
         }
     }
 
-    function confetti(number, spawn = new TopDelayedSpawn()) {
+    function confetti(number, spawn = new TopSpawn()) {
         for (let i = 0; i < number; i++) {
             spawn.next();
             spawnParticle(spawn);
@@ -149,7 +194,12 @@ const confetti = function () {
         }
     }
 
+    confetti.canvas = canvas;
     confetti.colors = colors;
-    confetti.ParticleSpawnClass = ParticleSpawn;
+    confetti.ParticleSpawn = ParticleSpawn;
+    confetti.DelayedSpawn = DelayedSpawn;
+    confetti.TopSpawn = TopSpawn;
+    confetti.ExplosionSpawn = ExplosionSpawn;
+    confetti.Vec2 = Vec2;
     return confetti;
 }();
