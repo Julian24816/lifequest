@@ -4,6 +4,7 @@ const confetti = function () {
     const ctx = canvas.getContext("2d");
     canvas.style.position = "fixed";
     canvas.style.top = canvas.style.left = "0";
+    canvas.style.display = "none";
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     document.addEventListener("DOMContentLoaded", () => document.body.append(canvas));
@@ -179,11 +180,13 @@ const confetti = function () {
         running = particles.length > 0;
 
         // draw
+        canvas.style.display = "block";
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         particles.forEach(drawParticle);
 
         //next frame
         if (running) requestAnimationFrame(animation);
+        else canvas.style.display = "none";
     }
 
     // spawn number confetti into the simulation according to spawn information

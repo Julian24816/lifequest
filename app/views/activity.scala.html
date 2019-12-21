@@ -1,0 +1,11 @@
+@()
+
+@scripts = {
+    <script src="@routes.Assets.versioned("javascripts/activity.js")" type="text/javascript"></script>
+}
+
+@main("Activity", scripts) {
+    <label for="activity">Activity: </label>
+    <input id="activity" type="text" autofocus />
+    <button id="submit">submit</button>
+}
