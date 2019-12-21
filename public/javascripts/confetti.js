@@ -1,4 +1,5 @@
 const confetti = function () {
+    // canvas
     const canvas = document.createElement("canvas");
     canvas.style.position = "fixed";
     canvas.style.top = canvas.style.left = "0";
@@ -10,20 +11,20 @@ const confetti = function () {
         canvas.height = window.innerHeight;
     });
 
+    // context & text settings
     const ctx = canvas.getContext("2d");
-    ////////////////////////////////// temp text test
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     ctx.font = "20em san-serif";
-    ctx.fillStyle = "rgb(18,196,61)";
-    ctx.fillText("Merry Christmas :)", canvas.width / 2, canvas.height / 3);
-    ////////////////////////////////// TODO remove tempt text test
 
+    // default colors
     const colors = [[165, 104, 246], [230, 61, 135], [0, 199, 228], [253, 214, 126]];
 
+    // simulation state
     let running = false;
     const particles = [];
 
+    // random number helpers
     function random(limit = 1, floor = true) {
         const r = Math.random() * limit;
         return floor ? Math.floor(r) : r;
@@ -33,56 +34,7 @@ const confetti = function () {
         return array[random(array.length, true)];
     }
 
-    function makeColorString(colorArray = [0, 0, 0], alpha = 1) {
-        return "rgba(" + colorArray + ", " + alpha + ")";
-    }
-
-    function spawnParticle(spawnAttributes = new ParticleSpawn()) {
-        particles.push({
-            pos: spawnAttributes.pos,
-            radius: spawnAttributes.radius,
-            color: spawnAttributes.color,
-            lifetime: spawnAttributes.lifetime,
-            velocity: spawnAttributes.velocity,
-            acceleration: spawnAttributes.acceleration,
-        });
-        if (!running) requestAnimationFrame(animation);
-        running = true;
-    }
-
-    function drawParticle(particle) {
-        const opacity = particle.lifetime < 10 ? particle.lifetime / 10 : 1;
-        ctx.fillStyle = makeColorString(particle.color, opacity);
-        ctx.beginPath();
-        ctx.arc(particle.pos.x, particle.pos.y, particle.radius, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    function updateParticle(particle) {
-        particle.lifetime -= 1;
-        particle.pos.add(particle.velocity);
-        particle.velocity.add(particle.acceleration);
-    }
-
-    function removeDeadParticles(particles) {
-        for (let i = particles.length - 1; i >= 0; i--) if (!particles[i].lifetime) particles.splice(i, 1);
-    }
-
-    function animation() {
-        // draw
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(drawParticle);
-
-        //update
-        particles.forEach(updateParticle);
-        removeDeadParticles(particles);
-        running = particles.length > 0;
-
-        //next frame
-        if (running) requestAnimationFrame(animation);
-        else requestAnimationFrame(() => ctx.clearRect(0, 0, canvas.width, canvas.height));
-    }
-
+    // tuple class
     class Vec2 {
         constructor(x = 0, y = 0) {
             this.x = x;
@@ -99,6 +51,7 @@ const confetti = function () {
         }
     }
 
+    // Particle Spawn Information
     class ParticleSpawn {
         get pos() {
             return new Vec2(random(canvas.width), canvas.height);
@@ -183,6 +136,65 @@ const confetti = function () {
         }
     }
 
+    // fill simulation with additional particle
+    function spawnParticle(spawnAttributes = new ParticleSpawn()) {
+        particles.push({
+            pos: spawnAttributes.pos,
+            radius: spawnAttributes.radius,
+            color: spawnAttributes.color,
+            lifetime: spawnAttributes.lifetime,
+            velocity: spawnAttributes.velocity,
+            acceleration: spawnAttributes.acceleration,
+        });
+        if (!running) requestAnimationFrame(animation);
+        running = true;
+    }
+
+    // compute color string
+    function makeColorString(colorArray = [0, 0, 0], alpha = 1) {
+        return "rgba(" + colorArray + ", " + alpha + ")";
+    }
+
+    // draw one particle
+    function drawParticle(particle) {
+        const opacity = particle.lifetime < 10 ? particle.lifetime / 10 : 1;
+        ctx.fillStyle = makeColorString(particle.color, opacity);
+        ctx.beginPath();
+        ctx.arc(particle.pos.x, particle.pos.y, particle.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // update one particle
+    function updateParticle(particle) {
+        particle.lifetime -= 1;
+        particle.pos.add(particle.velocity);
+        particle.velocity.add(particle.acceleration);
+    }
+
+    // remove dead particle from simulation
+    function removeDeadParticles(particles) {
+        for (let i = particles.length - 1; i >= 0; i--) if (!particles[i].lifetime) particles.splice(i, 1);
+    }
+
+    // tick simulation. clear canvas, when no particles left
+    function animation() {
+        // draw
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(drawParticle);
+        ctx.fillStyle = makeColorString(choose(colors));
+        ctx.fillText(confetti.text, canvas.width / 2, canvas.height / 3);
+
+        //update
+        particles.forEach(updateParticle);
+        removeDeadParticles(particles);
+        running = particles.length > 0;
+
+        //next frame
+        if (running) requestAnimationFrame(animation);
+        else requestAnimationFrame(() => ctx.clearRect(0, 0, canvas.width, canvas.height));
+    }
+
+    // spawn number confetti into the simulation according to spawn information
     function confetti(number, spawn = new TopSpawn()) {
         for (let i = 0; i < number; i++) {
             spawn.next();
@@ -194,6 +206,8 @@ const confetti = function () {
         }
     }
 
+    // exposed values
+    confetti.text = "";
     confetti.canvas = canvas;
     confetti.colors = colors;
     confetti.ParticleSpawn = ParticleSpawn;
