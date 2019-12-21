@@ -35,8 +35,7 @@ const confetti = function () {
 
     function spawnParticle(spawnAttributes = new ParticleSpawn()) {
         particles.push({
-            x: spawnAttributes.x,
-            y: spawnAttributes.y,
+            pos: spawnAttributes.pos,
             radius: spawnAttributes.radius,
             color: spawnAttributes.color,
             lifetime: spawnAttributes.lifetime,
@@ -50,13 +49,13 @@ const confetti = function () {
         const opacity = particle.lifetime < 10 ? particle.lifetime / 10 : 1;
         ctx.fillStyle = makeColorString(particle.color, opacity);
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.arc(particle.pos.x, particle.pos.y, particle.radius, 0, Math.PI * 2);
         ctx.fill();
     }
 
     function updateParticle(particle) {
         particle.lifetime -= 1;
-        particle.y += particle.speed;
+        particle.pos.y += particle.speed;
     }
 
     function removeDeadParticles(particles) {
@@ -78,13 +77,20 @@ const confetti = function () {
         else requestAnimationFrame(() => ctx.clearRect(0, 0, canvas.width, canvas.height));
     }
 
-    class ParticleSpawn {
-        get x() {
-            return random(canvas.width);
+    class Vec2 {
+        constructor(x = 0, y = 0) {
+            this.x = x;
+            this.y = y;
         }
+        add(other) {
+            this.x += other.x;
+            this.y += other.y;
+        }
+    }
 
-        get y() {
-            return random(canvas.height);
+    class ParticleSpawn {
+        get pos() {
+            return new Vec2(random(canvas.width), canvas.height);
         }
 
         get radius() {
@@ -118,7 +124,12 @@ const confetti = function () {
             this.counter = 0;
         }
 
-        get y() {return 0;}
+        get pos() {
+            const pos = super.pos;
+            pos.y = 0;
+            return pos;
+        }
+
         get waitForNextFrame() {
             return this.counter % this.delayEveryNParticles === 0;
         }
