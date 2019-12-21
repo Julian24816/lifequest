@@ -7,6 +7,7 @@ const confetti = function () {
     canvas.style.display = "none";
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    canvas.onclick = () => particles.splice(0);
     document.addEventListener("DOMContentLoaded", () => document.body.append(canvas));
     document.addEventListener("resize", () => {
         canvas.width = window.innerWidth;
