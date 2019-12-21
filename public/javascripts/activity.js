@@ -11,7 +11,7 @@ const activity = function () {
                 activityInput.value = "";
             }
         };
-        submitButton.onclick = ev => {
+        submitButton.onclick = () => {
             submit(activityInput.value);
             activityInput.value = ""
         }
