@@ -15,6 +15,8 @@ const confetti = function () {
     ctx.fillText("Merry Christmas :)", canvas.width / 2, canvas.height / 3);
     ////////////////////////////////// TODO remove tempt text test
 
+    const colors = [[165,104,246],[230,61,135],[0,199,228],[253,214,126]];
+
     let running = false;
     const particles = [];
 
@@ -23,17 +25,28 @@ const confetti = function () {
         return floor ? Math.floor(r) : r;
     }
 
+    function choose(array) {
+        return array[random(array.length, true)];
+    }
+
+    function makeColorString(colorArray = [0, 0, 0]) {
+        if (colorArray.length === 3) return "rgb(" + colorArray + ")";
+        if (colorArray.length === 4) return "rgba(" + colorArray + ")";
+        return "black";
+    }
+
     function spawnParticle(x = undefined, y = undefined) {
         particles.push({
             x: x !== undefined ? x : random(canvas.width),
             y: y !== undefined ? y : random(canvas.height),
             radius: random(4) + 1,
-            color: "rgb(165,104,246)",
-            lifetime: 100,
+            color: makeColorString(choose(colors)),
+            lifetime: random(200) + 50,
         });
     }
 
     function drawParticle(particle) {
+        ctx.fillStyle = particle.color;
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -63,5 +76,6 @@ const confetti = function () {
         running = true;
     }
 
+    confetti.colors = colors;
     return confetti;
 }();
