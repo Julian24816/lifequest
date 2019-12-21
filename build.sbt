@@ -1,5 +1,5 @@
-name := """play-java-hello-world-tutorial"""
-organization := "com.example"
+name := "lifequest"
+organization := "de.julianpadawan"
 
 version := "1.0-SNAPSHOT"
 
