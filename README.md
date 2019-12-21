@@ -1,51 +1,35 @@
-# play-java-starter-example
+# Play Hello World Web Tutorial for Java
 
-This is a starter application that shows how Play works.  Please see the documentation at https://www.playframework.com/documentation/latest/Home for more details.
+To follow the steps in this tutorial, you will need the correct version of Java and a build tool. You can build Play projects with any Java build tool. Since sbt takes advantage of Play features such as auto-reload, the tutorial describes how to build the project with sbt. 
 
-## Running
+Prerequisites include:
 
-Run this using [sbt](http://www.scala-sbt.org/).  If you downloaded this project from http://www.playframework.com/download then you'll find a prepackaged version of sbt in the project directory:
+* Java Software Developer's Kit (SE) 1.8 or higher
+* sbt 0.13.15 or higher (we recommend 1.2.3) Note: if you downloaded this project as a zip file from https://developer.lightbend.com, the file includes an sbt distribution for your convenience.
 
-```
-sbt run
-```
+To check your Java version, enter the following in a command window:
 
-And then go to http://localhost:9000 to see the running web application.
+`java -version`
 
-## Controllers
+To check your sbt version, enter the following in a command window:
 
-There are several demonstration files available in this template.
+`sbt sbtVersion`
 
-- `HomeController.java`:
+If you do not have the required versions, follow these links to obtain them:
 
-  Shows how to handle simple HTTP requests.
+* [Java SE](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+* [sbt](http://www.scala-sbt.org/download.html)
 
-- `AsyncController.java`:
+## Build and run the project
 
-  Shows how to do asynchronous programming when handling a request.
+This example Play project was created from a seed template. It includes all Play components and an Akka HTTP server. The project is also configured with filters for Cross-Site Request Forgery (CSRF) protection and security headers.
 
-- `CountController.java`:
+To build and run the project:
 
-  Shows how to inject a component into a controller and use the component when
-  handling requests.
+1. Use a command window to change into the example project directory, for example: `cd play-java-hello-world-web`
 
-## Components
+2. Build the project. Enter: `sbt run`. The project builds and starts the embedded HTTP server. Since this downloads libraries and dependencies, the amount of time required depends partly on your connection's speed.
 
-- `Module.java`:
+3. After the message `Server started, ...` displays, enter the following URL in a browser: <http://localhost:9000>
 
-  Shows how to use Guice to bind all the components needed by your application.
-
-- `Counter.java`:
-
-  An example of a component that contains state, in this case a simple counter.
-
-- `ApplicationTimer.java`:
-
-  An example of a component that starts when the application starts and stops
-  when the application stops.
-
-## Filters
-
-- `ExampleFilter.java`:
-
-  A simple filter that adds a header to every response.
+The Play application responds: `Welcome to the Hello World Tutorial!`
